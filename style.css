@@ -1,0 +1,102 @@
+/*  margin and padding */
+body, h1, p {
+  margin: 0;
+  padding: 0;
+}
+
+/* Setting up global font styles */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f0ebeb;
+  color: #333;
+}
+
+/* Centering the movie container */
+.movie-container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Styling for individual movie items */
+.movie-item {
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 20px;
+  padding: 20px;
+  background: linear-gradient(to bottom, #ffffff, #f2f2f2);
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Hover effect for movie items */
+.movie-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Styling for movie item image */
+.movie-item img {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Styling for movie item title */
+.movie-item h1 {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+  color: #007bff;
+  text-align: center;
+}
+
+/* Styling for movie item description */
+.movie-item p {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+/* Styling for movie item details list */
+.movie-item ul {
+  list-style-type: none;
+  padding: 0;
+  margin-bottom: 10px;
+  text-align: left;
+}
+
+/* Styling for movie item details list items */
+.movie-item ul li {
+  margin-bottom: 5px;
+  color: #888;
+}
+
+/* Styling for purchase ticket button */
+.movie-item button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.movie-item button:hover {
+  background-color: #0056b3;
+}
