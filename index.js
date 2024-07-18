@@ -1,56 +1,108 @@
-const movieContainer = document.querySelector(".movie-container"); // Selecting the movie container element
-const urlEndpoint = "http://localhost:8900/films"; // Endpoint for fetching movie data
+const BASE_URL = "http://localhost:3001";
 
-// Function to fetch movie data from API
-async function fetchMovies() {
-    try {
-        let response = await fetch(urlEndpoint); // Fetch data from API
-        let data = await response.json(); // Parse response as JSON
-        displayMovies(data); // Display movies on the webpage
-    } catch (error) {
-        console.error('Error fetching movies:', error);
-        alert('Failed to fetch movies. Please try again later.');
+// Function to fetch and display details of a single movie by id
+const displayMovieDetails = async (id) => {
+  try {
+    const res = await fetch(`${BASE_URL}/films/${id}`);
+    if (!res.ok) {
+      throw new Error("Failed to fetch movie details");
     }
-}
+    const movie = await res.json();
 
-// Function to display movies in the DOM
-function displayMovies(movies) {
-    movieContainer.innerHTML = movies.map(movie => `
-        <div class="movie-item">
-            <img src="${movie.poster}" alt="">
-            <h1>${movie.title}</h1>
-            <p>${movie.description}</p>
-            <ul>
-                <li>Showtime: ${movie.showtime}</li>
-                <li>Runtime: ${movie.runtime}</li>
-                <li>Capacity: ${movie.capacity}</li>
-                <li>Tickets Sold: ${movie.tickets_sold}</li>
-            </ul>
-            <button onclick="purchaseTicket(${movie.id}, ${movie.tickets_sold})">Purchase Ticket</button>
-        </div>
-    `).join('');
-}
+    const movieItem = document.querySelector(".movie-item");
 
-// Function to purchase a ticket (PATCH request to update tickets_sold)
-async function purchaseTicket(id, ticketsSold) {
-    try {
-        let ticketsNew = { tickets_sold: ticketsSold + 1 }; // Increment tickets_sold by 1
-        let response = await fetch(`${urlEndpoint}/${id}`, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(ticketsNew) // Convert object to JSON string
-        });
-        let data = await response.json(); // Parse response as JSON
-        console.log('Ticket purchased successfully:', data); // Log success message
-        // Optionally update the UI or fetch updated data
-        fetchMovies(); // Refresh movie list after ticket purchase
-    } catch (error) {
-        console.error('Error purchasing ticket:', error);
-        alert('Failed to purchase ticket. Please try again later.');
+    // Clear previous movie details
+    movieItem.innerHTML = "";
+
+    // Poster
+    const img = document.createElement("img");
+    img.src = movie.poster;
+    img.classList.add("poster");
+    movieItem.appendChild(img);
+
+    // Metadata
+    const metadata = document.createElement("div");
+    metadata.classList.add("metadata");
+
+    // Title
+    const h2 = document.createElement("h2");
+    h2.innerText = movie.title;
+    metadata.appendChild(h2);
+
+    // Runtime
+    const h4Runtime = document.createElement("h4");
+    h4Runtime.innerText = `${movie.runtime} minutes`;
+    metadata.appendChild(h4Runtime);
+
+    // Showtime
+    const pShowtime = document.createElement("p");
+    pShowtime.innerText = `Showtime: ${movie.showtime}`;
+    metadata.appendChild(pShowtime);
+
+    // Available tickets calculation
+    const availableTickets = movie.capacity - movie.tickets_sold;
+    const h3Tickets = document.createElement("h3");
+    h3Tickets.innerText = `Available tickets: ${availableTickets}`;
+    metadata.appendChild(h3Tickets);
+
+    // Buy Ticket button
+    const buyTicket = document.createElement("button");
+    buyTicket.innerText = availableTickets > 0 ? "Buy Ticket" : "Sold Out";
+    buyTicket.classList.add("buy-ticket");
+    buyTicket.addEventListener("click", async () => {
+      if (availableTickets <= 0) {
+        alert("Tickets are sold out!");
+        return;
+      }
+
+      // Update tickets_sold locally
+      movie.tickets_sold++;
+      h3Tickets.innerText = `Available tickets: ${movie.capacity - movie.tickets_sold}`;
+      buyTicket.innerText = movie.tickets_sold < movie.capacity ? "Buy Ticket" : "Sold Out";
+
+    });
+    metadata.appendChild(buyTicket);
+
+    // Description 
+    const pDescription = document.createElement("p");
+    pDescription.innerText = movie.description;
+    metadata.appendChild(pDescription);
+
+    // Append metadata to movieItem container
+    movieItem.appendChild(metadata);
+  } catch (error) {
+    console.error("Error fetching movie details:", error);
+  }
+};
+
+// Function to fetch all movies and populate the film menu
+const populateFilmMenu = async () => {
+  try {
+    const res = await fetch(`${BASE_URL}/films`);
+    if (!res.ok) {
+      throw new Error("Failed to fetch movie list");
     }
-}
+    const movies = await res.json();
 
-// Fetch movies when the page loads
-fetchMovies();
+    const filmsList = document.getElementById("films");
+    filmsList.innerHTML = ""; // Clear existing list items
+
+    movies.forEach((movie) => {
+      const li = document.createElement("li");
+      li.classList.add("film", "item");
+      li.innerText = movie.title;
+      li.addEventListener("click", () => {
+        displayMovieDetails(movie.id);
+      });
+      filmsList.appendChild(li);
+    });
+  } catch (error) {
+    console.error("Error fetching movie list:", error);
+  }
+};
+
+// Initial setup when the page loads
+window.onload = () => {
+  displayMovieDetails(1); 
+  populateFilmMenu(); 
+};
